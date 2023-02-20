@@ -13,7 +13,7 @@ async def verupikkals(bot, message):
     users = await db.get_all_users()
     b_msg = message.reply_to_message
     sts = await message.reply_text(
-        text='ʙʀᴏᴀᴅᴄᴀsᴛɪɴɢ ᴜʀ ᴍᴇssᴀɢᴇ ᴛᴏ ᴛʜɪs ʙᴏᴛ ᴜsᴇʀs...'
+        text='Broadcasting your messages...'
     )
     start_time = time.time()
     total_users = await db.total_users_count()
@@ -37,6 +37,34 @@ async def verupikkals(bot, message):
         done += 1
         await asyncio.sleep(2)
         if not done % 20:
-            await sts.edit(f"ʙʀᴏᴀᴅᴄᴀsᴛ ɪɴ ᴘʀᴏɢʀᴇss:\n\nᴛᴏᴛᴀʟ ᴜsᴇʀs {total_users}\nᴄᴏᴍᴘʟᴇᴛᴇᴅ: {done} / {total_users}\nsᴜᴄᴄᴇss: {success}\nʙʟᴏᴄᴋᴇᴅ: {blocked}\nᴅᴇʟᴇᴛᴇᴅ: {deleted}")    
+            await sts.edit(f"**Broadcast in progress:**\n\n**Total Users** {total_users}\n**Completed:** {done} / {total_users}\n**Success:** {success}\n**Blocked:** {blocked}\n**Deleted:** {deleted}")    
     time_taken = datetime.timedelta(seconds=int(time.time()-start_time))
-    await sts.edit(f"ʙʀᴏᴀᴅᴄᴀsᴛ sᴜᴄᴄᴇssғᴜʟʟʏ ᴄᴏᴍᴘʟᴇᴛᴇᴅ:\nʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ɪɴ{time_taken} sᴇᴄᴏɴᴅs.\n\nᴛᴏᴛᴀʟ ᴜsᴇʀs {total_users}\nᴄᴏᴍᴘʟᴇᴛᴇᴅ: {done} / {total_users}\nsᴜᴄᴄᴇss: {success}\nʙʟᴏᴄᴋᴇᴅ: {blocked}\nᴅᴇʟᴇᴛᴇᴅ: {deleted}")
+    await sts.edit(f"<b>Broadcast Completed:\nCompleted in {time_taken} seconds.\n\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nBlocked: {blocked}\nDeleted: {deleted}</b>")
+
+   
+@Client.on_message(filters.command("gpbroadcast") & filters.user(ADMINS) & filters.reply)
+async def gpbroadcast(bot, message):
+    chats = await db.get_all_chats()
+    b_msg = message.reply_to_message
+    sts = await message.reply_text(
+        text='**Broadcasting your messages...**'
+    )
+    start_time = time.time()
+    total_chats = await db.total_chat_count()
+    done = 0
+    failed =0
+
+    success = 0
+    async for chat in chats:
+        pti, sh = await broadcast_messages(int(chat['id']), b_msg)
+        if pti:
+            success += 1
+        elif pti == False:
+            if sh == "Error":
+                failed += 1
+        done += 1
+        await asyncio.sleep(2)
+        if not done % 20:
+            await sts.edit(f"Groups Broadcast in progress...\n\nTotal Groups: <code>{total_chats}</code>\nCompleted: <code>{done}</code> / <code>{total_chats}</code>\nSuccess: <code>{success}</code>\nFailed: <code>{failed}</code>")
+    time_taken = datetime.timedelta(seconds=int(time.time()-start_time))
+    await sts.edit(f"Groups Broadcast Completed.\nCompleted in {time_taken} seconds.\n\nTotal Groups: <code>{total_chats}</code>\nCompleted: <code>{done}</code> / <code>{total_chats}</code>\nSuccess: <code>{success}</code>\nFailed: <code>{failed}</code>")    
